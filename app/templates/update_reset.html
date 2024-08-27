@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="YourName">
+  <title>Update Password</title>
+  <style>
+    /* Styles for the form container */
+    .form-container {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 40px;
+    }
+
+    /* Heading styles */
+    .form-container h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+      text-align: center;
+    }
+
+    /* Form group styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    /* Button styles */
+    .btn-primary {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    /* Message styles */
+    #message {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    /* Responsive styles */
+    @media (max-width: 767px) {
+      .form-container {
+        margin: 20px;
+        padding: 15px;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+
+    /* Footer styles */
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #f1f1f1;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section Start -->
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <a class="navbar-brand" href="/">YourSite</a>
+    </div>
+  </nav>
+  <!-- Header Section End -->
+
+  <!-- Content section Start -->
+  <section id="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <div class="form-container">
+            <h2>Update Your Password</h2>
+            
+            <form action="{% url 'update_pass' uidb64=uid token=token %}" method="post">
+              {% csrf_token %}
+               <!-- Display form errors -->
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Password fields -->
+    <div>
+        <label for="id_new_password1">New password:</label>
+        <div class="helptext" id="id_new_password1_helptext">
+            <ul>
+                <li>Your password can’t be too similar to your other personal information.</li>
+                <li>Your password must contain at least 8 characters.</li>
+                <li>Your password can’t be a commonly used password.</li>
+                <li>Your password can’t be entirely numeric.</li>
+            </ul>
+        </div>
+              <div class="form-group">
+                  <label for="password">New Password:</label>
+                  <input type="password" id="password" name="new_password1" class="form-control" placeholder="New Password" required>
+              </div>
+              <div class="form-group">
+                  <label for="confirm-password">Confirm New Password:</label>
+                  <input type="password" id="confirm-password" name="new_password2" class="form-control" placeholder="Confirm Password" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Update Password</button>
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Content section End -->
+
+  <!-- Footer Section Start -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 YourSite. All rights reserved.</p>
+    </div>
+  </footer>
+  <!-- Footer Section End -->
+
+  <!-- JavaScript -->
+  <script type="text/javascript" src="/static/assets/js/jquery-min.js"></script>
+  <script type="text/javascript" src="/static/assets/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    document.getElementById('update-password-form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirm-password').value;
+      var messageDiv = document.getElementById('message');
+
+      if (password !== confirmPassword) {
+        messageDiv.style.display = 'block';
+        messageDiv.innerHTML = '<p style="color: red;">Passwords do not match. Please try again.</p>';
+        return;
+      }
+
+      // Make an AJAX request to submit the form data
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/update-password/', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          messageDiv.style.display = 'block';
+          messageDiv.innerHTML = '<p>Password updated successfully!</p>';
+          setTimeout(function() {
+            window.location.href = '/login/'; // Redirect to the login page or another page
+          }, 2000);
+        } else {
+          messageDiv.style.display = 'block';
+          messageDiv.innerHTML = '<p style="color: red;">There was an error updating your password. Please try again.</p>';
+        }
+      };
+      xhr.send('password=' + encodeURIComponent(password) + '&confirm_password=' + encodeURIComponent(confirmPassword));
+    });
+  </script>
+</body>
+</html>
